@@ -342,3 +342,32 @@ li.completed-anim{
     grid-template-columns:1fr;
   }
 }
+/* ================= FIX MOBILE CALENDARIO ================= */
+@media (max-width: 768px){
+
+  .calendar{
+    gap:4px;
+  }
+
+  .day{
+    padding:0; /* quitamos padding fijo */
+    aspect-ratio:1/1; /* 🔥 cuadros perfectos */
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:14px;
+    border-radius:8px;
+  }
+
+}
+.day{
+  transition: all .2s ease;
+}
+
+.day:hover{
+  transform: scale(1.05);
+}
+
+.day.selected{
+  box-shadow: 0 0 10px #f97316;
+}
