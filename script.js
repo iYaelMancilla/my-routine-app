@@ -13,6 +13,9 @@ const routineDuration = document.getElementById('routineDuration');
 const routineList = document.getElementById('routineList');
 const currentClassText = document.getElementById('currentClass');
 
+const soundComplete = new Audio("https://cdn.pixabay.com/download/audio/2022/03/15/audio_115b9b7d4b.mp3?filename=click-124467.mp3");
+const soundClick = new Audio("https://cdn.pixabay.com/download/audio/2022/03/10/audio_270f49b3c0.mp3?filename=click-124467.mp3");
+
 // 🎓 NUEVO
 const subjectName = document.getElementById('subjectName');
 const subjectDay = document.getElementById('subjectDay');
@@ -101,7 +104,18 @@ function saveTask(title, desc, image){
 function toggleTask(i){
   const t = getTasks();
   t[i].done = !t[i].done;
-  save(); render();
+
+  save();
+  render();
+
+  // 🔥 animación
+  setTimeout(()=>{
+    const items = document.querySelectorAll('#taskList li');
+    if(items[i]){
+      items[i].classList.add('completed-anim');
+      setTimeout(()=>items[i].classList.remove('completed-anim'), 400);
+    }
+  },50);
 }
 
 function deleteTask(i){
@@ -381,6 +395,24 @@ function render(){
     taskList.appendChild(li);
   });
 
+  function addTask(){
+  const t = taskTitle.value.trim();
+  const d = taskDesc.value.trim();
+  const file = taskImage.files[0];
+
+  if(!t || !d) return;
+
+  feedback("click"); // 🔥
+
+  if(file){
+    const reader = new FileReader();
+    reader.onload = e => saveTask(t,d,e.target.result);
+    reader.readAsDataURL(file);
+  } else {
+    saveTask(t,d,null);
+  }
+}
+
   renderCalendar();
 
   // rutinas
@@ -430,6 +462,41 @@ function render(){
       routineList.appendChild(li);
     });
   }
+  function toggleTask(i){
+  const t = getTasks();
+  t[i].done = !t[i].done;
+
+  feedback("complete"); // 🔥 AQUÍ
+
+  save();
+  render();
+
+  setTimeout(()=>{
+    const items = document.querySelectorAll('#taskList li');
+    if(items[i]){
+      items[i].classList.add('completed-anim');
+      setTimeout(()=>items[i].classList.remove('completed-anim'), 400);
+    }
+  },50);
+}
+function addRoutine(){
+  const title = routineTitle.value.trim();
+  const time = routineTime.value;
+  const duration = parseInt(routineDuration.value);
+
+  if(!title || !time || !duration) return;
+
+  feedback("click"); // 🔥
+
+  getRoutines().push({title,time,duration,done:false});
+
+  routineTitle.value='';
+  routineTime.value='';
+  routineDuration.value='';
+
+  save();
+  render();
+}
 
   // 🎓 universidad
   if(subjectList){
@@ -460,6 +527,33 @@ function render(){
     });
   }
 }
+function feedback(type){
+  // 🔊 sonido
+  if(type === "complete"){
+    soundComplete.currentTime = 0;
+    soundComplete.play();
+  }else{
+    soundClick.currentTime = 0;
+    soundClick.play();
+  }
 
+  // 📳 vibración
+  if(navigator.vibrate){
+    if(type === "complete"){
+      navigator.vibrate([50, 30, 50]); // patrón fuerte
+    }else{
+      navigator.vibrate(20); // corto
+    }
+  }
+}
+function addAttendance(i){
+  if(!state.subjects[i]) return;
+
+  feedback("click"); // 🔥
+
+  state.subjects[i].attendance++;
+  save();
+  render();
+}
 // ================= INIT =================
 render();

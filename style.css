@@ -8,11 +8,17 @@
   --danger:#ef4444;
 }
 
-/* base */
+/* ================= BASE ================= */
 body{
   margin:0;
-  font-family:system-ui;
-  background:var(--bg);
+  font-family:'Segoe UI', system-ui;
+
+  /* 🔥 fondo con personalidad */
+  background:
+    radial-gradient(circle at 20% 10%, #f9731610, transparent 40%),
+    radial-gradient(circle at 80% 90%, #facc1510, transparent 40%),
+    var(--bg);
+
   color:var(--text);
 }
 
@@ -23,7 +29,7 @@ body{
   padding:20px;
 }
 
-/* header */
+/* ================= HEADER ================= */
 .top{
   display:flex;
   justify-content:space-between;
@@ -31,25 +37,53 @@ body{
   margin-bottom:20px;
 }
 
+h1{
+  font-size:28px;
+  letter-spacing:2px;
+}
+
+h1::after{
+  content:" TIGER MODE";
+  font-size:12px;
+  color:var(--gold);
+  opacity:0.7;
+  margin-left:10px;
+}
+
 .clock{
   color:var(--gold);
   font-weight:bold;
 }
 
-/* layout */
+/* ================= GRID ================= */
 .grid{
   display:grid;
   grid-template-columns:1fr 1fr;
   gap:16px;
 }
 
-/* cards */
+/* ================= CARDS ================= */
 .card{
   background:var(--card);
   padding:16px;
   border-radius:16px;
   border:1px solid #222;
   box-shadow:0 0 10px #0006;
+
+  /* 🔥 efecto tigre */
+  position:relative;
+}
+
+.card::before{
+  content:"";
+  position:absolute;
+  left:0;
+  top:10px;
+  bottom:10px;
+  width:3px;
+  background:linear-gradient(var(--orange), var(--gold));
+  border-radius:10px;
+  opacity:0.5;
 }
 
 h2{
@@ -57,7 +91,7 @@ h2{
   margin-top:0;
 }
 
-/* inputs */
+/* ================= INPUTS ================= */
 input, select{
   width:100%;
   margin:5px 0;
@@ -67,13 +101,15 @@ input, select{
   background:#000;
   color:white;
   outline:none;
+  transition:.2s;
 }
 
 input:focus, select:focus{
   border:1px solid var(--orange);
+  box-shadow:0 0 5px #f9731640;
 }
 
-/* fila */
+/* ================= ROW ================= */
 .row{
   display:flex;
   gap:10px;
@@ -86,26 +122,31 @@ input:focus, select:focus{
   padding:6px;
 }
 
-/* botones */
+/* ================= BOTONES ================= */
 button{
   padding:10px;
   border:none;
   border-radius:8px;
-  background:var(--orange);
+
+  /* 🔥 mejor estilo */
+  background:linear-gradient(135deg, #f97316, #ea580c);
   color:white;
   cursor:pointer;
   transition:.2s;
+  box-shadow:0 4px 15px #f9731630;
 }
 
 button:hover{
-  opacity:.8;
+  transform:translateY(-1px);
+  opacity:.9;
 }
 
 button.danger{
   background:var(--danger);
+  box-shadow:0 4px 10px #ef444430;
 }
 
-/* lista */
+/* ================= LISTAS ================= */
 ul{
   list-style:none;
   padding:0;
@@ -123,7 +164,8 @@ li{
 }
 
 li:hover{
-  transform:scale(1.01);
+  transform:translateX(6px); /* 🔥 movimiento tipo acecho */
+  background:#111;
 }
 
 /* tarea completada */
@@ -139,7 +181,7 @@ li img{
   border-radius:6px;
 }
 
-/* calendario */
+/* ================= CALENDARIO ================= */
 .calendar{
   display:grid;
   grid-template-columns:repeat(7,1fr);
@@ -167,8 +209,7 @@ li img{
   border:1px solid var(--gold);
 }
 
-/* ================= RUTINA (GLOBAL) ================= */
-
+/* ================= RUTINA ================= */
 .routine-item{
   display:flex;
   align-items:center;
@@ -194,9 +235,11 @@ li img{
   font-size:12px;
 }
 
+/* 🔥 modo activo */
 .routine-item.active{
   border:2px solid var(--gold);
-  background:#111;
+  background:linear-gradient(90deg, #111, #1a1a1a);
+  box-shadow:0 0 10px #facc1520;
 }
 
 .routine-item.active small{
@@ -216,7 +259,11 @@ li img{
 
 .progress-fill{
   height:100%;
-  background:var(--gold);
+
+  /* 🔥 mejor visual */
+  background:linear-gradient(90deg, #facc15, #f97316);
+  box-shadow:0 0 8px #facc1550;
+
   transition:width .3s ease;
 }
 
@@ -226,7 +273,6 @@ li img{
 }
 
 /* ================= UNIVERSIDAD ================= */
-
 #subjectList li{
   display:flex;
   justify-content:space-between;
@@ -237,17 +283,79 @@ li img{
   border:2px solid var(--gold);
 }
 
-/* ================= RESPONSIVE ================= */
+/* 🔥 clase actual */
 #currentClass{
   color: var(--gold);
   font-size: 13px;
   margin-top: 4px;
   opacity: 0.9;
 }
+
+/* ================= RESPONSIVE ================= */
 @media (max-width: 768px){
   .grid{
     grid-template-columns:1fr;
   }
 
 
+}
+
+@keyframes strike{
+  0%{transform:scale(1); box-shadow:0 0 0 transparent;}
+  50%{transform:scale(1.05); box-shadow:0 0 15px #f97316;}
+  100%{transform:scale(1); box-shadow:0 0 0 transparent;}
+}
+
+li.completed-anim{
+  animation: strike .4s ease;
+}
+
+@keyframes pulse{
+  0%{opacity:0.6;}
+  50%{opacity:1;}
+  100%{opacity:0.6;}
+}
+
+.routine-item.active .progress-fill{
+  animation:pulse 2s infinite;
+}
+@keyframes fadeUp{
+  from{
+    opacity:0;
+    transform:translateY(10px);
+  }
+  to{
+    opacity:1;
+    transform:translateY(0);
+  }
+}
+
+li{
+  animation:fadeUp .3s ease;
+}
+@keyframes fadeUp{
+  from{
+    opacity:0;
+    transform:translateY(10px);
+  }
+  to{
+    opacity:1;
+    transform:translateY(0);
+  }
+}
+
+li{
+  animation:fadeUp .3s ease;
+}
+li:hover{
+  transform:translateX(8px) scale(1.01);
+}
+@keyframes glow{
+  0%{box-shadow:0 0 5px #facc15;}
+  50%{box-shadow:0 0 15px #facc15;}
+  100%{box-shadow:0 0 5px #facc15;}
+}
+
+#subjectList li.active{
+  animation:glow 2s infinite;
 }
