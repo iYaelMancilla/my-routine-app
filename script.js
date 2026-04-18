@@ -1,3 +1,13 @@
+const SESSION_KEY = "rutina-session";
+
+if(localStorage.getItem(SESSION_KEY) !== "active"){
+  window.location.href = "login.html";
+}
+
+function logout(){
+  localStorage.removeItem("rutina-session");
+  window.location.href = "login.html";
+}
 // ================= AUDIO =================
 let audioEnabled = false;
 
