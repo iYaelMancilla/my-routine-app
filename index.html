@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mi Rutina</title>
+
+  <!-- CSS -->
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+<div class="app">
+
+  <div class="top">
+    <h1> My Routine App</h1>
+    <div class="clock" id="clock"></div>
+  </div>
+
+  <div class="grid">
+
+    <!-- TAREAS -->
+    <div class="card">
+      <h2 id="dayTitle">Tareas del día</h2>
+
+      <input id="taskTitle" placeholder="Título">
+      <input id="taskDesc" placeholder="Descripción">
+
+      <div class="row">
+        <input type="file" id="taskImage" accept="image/*">
+        <button onclick="addTask()">Agregar</button>
+      </div>
+
+      <ul id="taskList"></ul>
+    </div>
+
+    <!-- CALENDARIO -->
+    <div class="card">
+      <h2>Calendario</h2>
+      <div id="calendar" class="calendar"></div>
+    </div>
+
+    <!-- RUTINA DIARIA -->
+<div class="card">
+  <h2>Rutina diaria</h2>
+
+  <input id="routineTitle" placeholder="Actividad (ej: Leer)">
+  <input id="routineTime" type="time">
+  <input id="routineDuration" type="number" placeholder="Duración (minutos)">
+
+  <button onclick="addRoutine()">Agregar rutina</button>
+
+  <ul id="routineList"></ul>
+</div>
+
+  </div>
+
+</div>
+
+<!-- JS -->
+<script src="script.js" defer></script>
+
+<div class="progress-bar">
+  <div class="progress-fill" style="width:${getProgress(r)}%"></div>
+</div>
+
+</body>
+</html>
