@@ -84,6 +84,20 @@ function getToday(){
   return `${d.getFullYear()}-${d.getMonth()+1}-${d.getDate()}`;
 }
 
+function formatTime(time){
+  if(!time) return "";
+
+  const [h,m] = time.split(':');
+  let hour = parseInt(h);
+
+  const ampm = hour >= 12 ? 'pm' : 'am';
+
+  hour = hour % 12;
+  if(hour === 0) hour = 12;
+
+  return `${hour}:${m} ${ampm}`;
+}
+
 // ================= CLOCK =================
 setInterval(()=>{
   const tasks = getTasks();
@@ -190,6 +204,37 @@ function deleteRoutine(i){
   const r = getRoutines();
   r.splice(i,1);
   save(); render();
+}
+
+// 🔥 TIEMPO RUTINA
+function getCurrentRoutine(){
+  const now = new Date();
+  const currentMinutes = now.getHours()*60 + now.getMinutes();
+
+  return getRoutines().find(r=>{
+    const [h,m] = r.time.split(':');
+    const start = parseInt(h)*60 + parseInt(m);
+    const end = start + parseInt(r.duration);
+
+    return currentMinutes >= start && currentMinutes <= end;
+  });
+}
+
+function getProgress(r){
+  const now = new Date();
+
+  const [h,m] = r.time.split(':');
+  const start = new Date();
+  start.setHours(h,m,0);
+
+  const end = new Date(start.getTime() + r.duration*60000);
+
+  let percent = ((now - start)/(end-start))*100;
+
+  if(percent<0) percent=0;
+  if(percent>100) percent=100;
+
+  return Math.floor(percent);
 }
 
 // ================= UNIVERSIDAD =================
@@ -362,6 +407,8 @@ function render(){
       .map((r,i)=>({...r,originalIndex:i}))
       .sort((a,b)=>a.time.localeCompare(b.time));
 
+    const current = getCurrentRoutine();
+
     sorted.forEach(r=>{
       const li=document.createElement('li');
       li.className='routine-item';
@@ -371,9 +418,24 @@ function render(){
         <div>
           <b>${r.title}</b>
           <small>${r.duration} min</small>
+
+          ${
+            current && r.time === current.time
+            ? `
+              <div class="progress-bar">
+                <div class="progress-fill" style="width:${getProgress(r)}%"></div>
+              </div>
+              <div class="progress-text">${getProgress(r)}%</div>
+            `
+            : ''
+          }
         </div>
         <button class="danger">✖</button>
       `;
+
+      if(current && r.time === current.time){
+        li.classList.add('active');
+      }
 
       li.onclick=()=>toggleRoutine(r.originalIndex);
 
@@ -404,7 +466,7 @@ function render(){
       `;
 
       if(currentClass && currentClass.name === s.name){
-        li.style.border = "2px solid gold";
+        li.classList.add('active');
       }
 
       li.querySelector('button').onclick = ()=> addAttendance(i);
