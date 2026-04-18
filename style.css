@@ -58,7 +58,7 @@ h2{
 }
 
 /* inputs */
-input{
+input, select{
   width:100%;
   margin:5px 0;
   padding:10px;
@@ -69,11 +69,11 @@ input{
   outline:none;
 }
 
-input:focus{
+input:focus, select:focus{
   border:1px solid var(--orange);
 }
 
-/* fila input + botón */
+/* fila */
 .row{
   display:flex;
   gap:10px;
@@ -167,12 +167,9 @@ li img{
   border:1px solid var(--gold);
 }
 
-/* responsive */
-@media (max-width: 768px){
-  .grid{
-    grid-template-columns:1fr;
-  }
-  .routine-item{
+/* ================= RUTINA (GLOBAL) ================= */
+
+.routine-item{
   display:flex;
   align-items:center;
   gap:12px;
@@ -196,17 +193,21 @@ li img{
   opacity:.7;
   font-size:12px;
 }
+
 .routine-item.active{
   border:2px solid var(--gold);
   background:#111;
 }
+
 .routine-item.active small{
   color: var(--gold);
   font-weight: bold;
 }
+
+/* barra progreso */
 .progress-bar{
   width:100%;
-  height:10px; /* súbelo para que se vea */
+  height:10px;
   background:#333;
   border-radius:10px;
   margin-top:8px;
@@ -215,10 +216,38 @@ li img{
 
 .progress-fill{
   height:100%;
-  background:yellow; /* 👈 prueba visible */
+  background:var(--gold);
+  transition:width .3s ease;
 }
+
 .progress-text{
   font-size:11px;
   opacity:0.7;
 }
+
+/* ================= UNIVERSIDAD ================= */
+
+#subjectList li{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+}
+
+#subjectList li.active{
+  border:2px solid var(--gold);
+}
+
+/* ================= RESPONSIVE ================= */
+#currentClass{
+  color: var(--gold);
+  font-size: 13px;
+  margin-top: 4px;
+  opacity: 0.9;
+}
+@media (max-width: 768px){
+  .grid{
+    grid-template-columns:1fr;
+  }
+
+
 }
