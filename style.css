@@ -197,12 +197,14 @@ li img{
 }
 
 .day{
-  padding:10px;
   background:#000;
-  border-radius:6px;
+  border-radius:8px;
   text-align:center;
   cursor:pointer;
-  transition:.2s;
+  transition:all .2s ease;
+
+  /* 🔥 importante para desktop */
+  padding:10px;
 }
 
 .day:hover{
@@ -212,12 +214,30 @@ li img{
 
 .day.selected{
   border:2px solid var(--orange);
+  box-shadow:0 0 10px #f97316;
 }
 
 .today{
   border:1px solid var(--gold);
 }
 
+/* ================= FIX MOBILE CALENDARIO ================= */
+@media (max-width: 768px){
+
+  .calendar{
+    gap:4px;
+  }
+
+  .day{
+    padding:0; /* 🔥 elimina conflicto */
+    aspect-ratio:1/1; /* 🔥 cuadrados perfectos */
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:14px;
+  }
+
+}
 /* ================= RUTINA ================= */
 .routine-item{
   display:flex;
@@ -370,4 +390,17 @@ li.completed-anim{
 
 .day.selected{
   box-shadow: 0 0 10px #f97316;
+}
+@media (max-width: 768px){
+
+  .calendar{
+    gap:5px;
+    padding:5px;
+  }
+
+  .day{
+    font-size:13px;
+    border-radius:10px;
+  }
+
 }
