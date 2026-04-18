@@ -13,7 +13,6 @@ body{
   margin:0;
   font-family:'Segoe UI', system-ui;
 
-  /* 🔥 fondo con personalidad */
   background:
     radial-gradient(circle at 20% 10%, #f9731610, transparent 40%),
     radial-gradient(circle at 80% 90%, #facc1510, transparent 40%),
@@ -69,9 +68,13 @@ h1::after{
   border-radius:16px;
   border:1px solid #222;
   box-shadow:0 0 10px #0006;
-
-  /* 🔥 efecto tigre */
   position:relative;
+  transition:.3s;
+}
+
+.card:hover{
+  transform:translateY(-2px);
+  box-shadow:0 10px 25px #0008;
 }
 
 .card::before{
@@ -106,7 +109,7 @@ input, select{
 
 input:focus, select:focus{
   border:1px solid var(--orange);
-  box-shadow:0 0 5px #f9731640;
+  box-shadow:0 0 6px #f9731640;
 }
 
 /* ================= ROW ================= */
@@ -127,8 +130,6 @@ button{
   padding:10px;
   border:none;
   border-radius:8px;
-
-  /* 🔥 mejor estilo */
   background:linear-gradient(135deg, #f97316, #ea580c);
   color:white;
   cursor:pointer;
@@ -139,6 +140,11 @@ button{
 button:hover{
   transform:translateY(-1px);
   opacity:.9;
+}
+
+button:active{
+  transform:scale(0.92);
+  box-shadow:0 0 10px #f97316 inset;
 }
 
 button.danger{
@@ -160,11 +166,13 @@ li{
   display:flex;
   justify-content:space-between;
   align-items:center;
+
   transition:.2s;
+  animation:fadeUp .3s ease;
 }
 
 li:hover{
-  transform:translateX(6px); /* 🔥 movimiento tipo acecho */
+  transform:translateX(8px) scale(1.01);
   background:#111;
 }
 
@@ -199,6 +207,7 @@ li img{
 
 .day:hover{
   background:#111;
+  transform:scale(1.05);
 }
 
 .day.selected{
@@ -235,11 +244,10 @@ li img{
   font-size:12px;
 }
 
-/* 🔥 modo activo */
 .routine-item.active{
   border:2px solid var(--gold);
   background:linear-gradient(90deg, #111, #1a1a1a);
-  box-shadow:0 0 10px #facc1520;
+  box-shadow:0 0 12px #facc1520;
 }
 
 .routine-item.active small{
@@ -259,12 +267,14 @@ li img{
 
 .progress-fill{
   height:100%;
-
-  /* 🔥 mejor visual */
   background:linear-gradient(90deg, #facc15, #f97316);
   box-shadow:0 0 8px #facc1550;
-
   transition:width .3s ease;
+}
+
+/* 🔥 animación viva */
+.routine-item.active .progress-fill{
+  animation:pulse 2s infinite;
 }
 
 .progress-text{
@@ -281,9 +291,10 @@ li img{
 
 #subjectList li.active{
   border:2px solid var(--gold);
+  animation:glow 2s infinite;
 }
 
-/* 🔥 clase actual */
+/* clase actual */
 #currentClass{
   color: var(--gold);
   font-size: 13px;
@@ -291,19 +302,11 @@ li img{
   opacity: 0.9;
 }
 
-/* ================= RESPONSIVE ================= */
-@media (max-width: 768px){
-  .grid{
-    grid-template-columns:1fr;
-  }
-
-
-}
-
+/* ================= ANIMACIONES ================= */
 @keyframes strike{
-  0%{transform:scale(1); box-shadow:0 0 0 transparent;}
+  0%{transform:scale(1);}
   50%{transform:scale(1.05); box-shadow:0 0 15px #f97316;}
-  100%{transform:scale(1); box-shadow:0 0 0 transparent;}
+  100%{transform:scale(1);}
 }
 
 li.completed-anim{
@@ -316,9 +319,6 @@ li.completed-anim{
   100%{opacity:0.6;}
 }
 
-.routine-item.active .progress-fill{
-  animation:pulse 2s infinite;
-}
 @keyframes fadeUp{
   from{
     opacity:0;
@@ -330,32 +330,15 @@ li.completed-anim{
   }
 }
 
-li{
-  animation:fadeUp .3s ease;
-}
-@keyframes fadeUp{
-  from{
-    opacity:0;
-    transform:translateY(10px);
-  }
-  to{
-    opacity:1;
-    transform:translateY(0);
-  }
-}
-
-li{
-  animation:fadeUp .3s ease;
-}
-li:hover{
-  transform:translateX(8px) scale(1.01);
-}
 @keyframes glow{
   0%{box-shadow:0 0 5px #facc15;}
   50%{box-shadow:0 0 15px #facc15;}
   100%{box-shadow:0 0 5px #facc15;}
 }
 
-#subjectList li.active{
-  animation:glow 2s infinite;
+/* ================= RESPONSIVE ================= */
+@media (max-width: 768px){
+  .grid{
+    grid-template-columns:1fr;
+  }
 }

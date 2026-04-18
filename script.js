@@ -1,3 +1,39 @@
+// ================= AUDIO =================
+let audioEnabled = false;
+
+const soundComplete = new Audio("https://assets.mixkit.co/active_storage/sfx/2568/2568-preview.mp3");
+const soundClick = new Audio("https://assets.mixkit.co/active_storage/sfx/2571/2571-preview.mp3");
+
+function enableAudio(){
+  if(audioEnabled) return;
+
+  soundClick.play().then(()=>{
+    soundClick.pause();
+    soundClick.currentTime = 0;
+    audioEnabled = true;
+  }).catch(()=>{});
+}
+
+document.addEventListener("click", enableAudio);
+
+function feedback(type){
+  if(audioEnabled){
+    try{
+      if(type === "complete"){
+        soundComplete.currentTime = 0;
+        soundComplete.play();
+      }else{
+        soundClick.currentTime = 0;
+        soundClick.play();
+      }
+    }catch(e){}
+  }
+
+  if(navigator.vibrate){
+    navigator.vibrate(type === "complete" ? [50,30,50] : 20);
+  }
+}
+
 // ================= DOM =================
 const clock = document.getElementById('clock');
 const taskTitle = document.getElementById('taskTitle');
@@ -11,12 +47,10 @@ const routineTitle = document.getElementById('routineTitle');
 const routineTime = document.getElementById('routineTime');
 const routineDuration = document.getElementById('routineDuration');
 const routineList = document.getElementById('routineList');
+
 const currentClassText = document.getElementById('currentClass');
 
-const soundComplete = new Audio("https://cdn.pixabay.com/download/audio/2022/03/15/audio_115b9b7d4b.mp3?filename=click-124467.mp3");
-const soundClick = new Audio("https://cdn.pixabay.com/download/audio/2022/03/10/audio_270f49b3c0.mp3?filename=click-124467.mp3");
-
-// 🎓 NUEVO
+// 🎓 UNIVERSIDAD
 const subjectName = document.getElementById('subjectName');
 const subjectDay = document.getElementById('subjectDay');
 const subjectStart = document.getElementById('subjectStart');
@@ -32,11 +66,7 @@ let state = JSON.parse(localStorage.getItem(KEY)) || {
   subjects: []
 };
 
-// 🔥 FIX DATOS VIEJOS (CLAVE)
-if(!state.subjects){
-  state.subjects = [];
-}
-
+if(!state.subjects) state.subjects = [];
 if(!state.routinesByDay){
   state.routinesByDay = {0:[],1:[],2:[],3:[],4:[],5:[],6:[]};
 }
@@ -58,16 +88,12 @@ function getToday(){
 setInterval(()=>{
   const tasks = getTasks();
   const done = tasks.filter(t=>t.done).length;
-  clock.textContent = `⏱ ${new Date().toLocaleTimeString()} | ✔ ${done}/${tasks.length}`;
-},1000);
 
-setInterval(()=>{
-  const tasks = getTasks();
-  const done = tasks.filter(t=>t.done).length;
   clock.textContent = `⏱ ${new Date().toLocaleTimeString()} | ✔ ${done}/${tasks.length}`;
 
-  updateCurrentClassUI(); // 🔥 AQUÍ
+  updateCurrentClassUI();
 },1000);
+
 // ================= TASKS =================
 function getTasks(){
   if(!state.tasksByDate[selectedDate]){
@@ -82,6 +108,8 @@ function addTask(){
   const file = taskImage.files[0];
 
   if(!t || !d) return;
+
+  feedback("click");
 
   if(file){
     const reader = new FileReader();
@@ -105,10 +133,11 @@ function toggleTask(i){
   const t = getTasks();
   t[i].done = !t[i].done;
 
+  feedback("complete");
+
   save();
   render();
 
-  // 🔥 animación
   setTimeout(()=>{
     const items = document.querySelectorAll('#taskList li');
     if(items[i]){
@@ -138,6 +167,8 @@ function addRoutine(){
   const duration = parseInt(routineDuration.value);
 
   if(!title || !time || !duration) return;
+
+  feedback("click");
 
   getRoutines().push({title,time,duration,done:false});
 
@@ -173,11 +204,7 @@ function addSubject(){
   let existing = state.subjects.find(s => s.name === name);
 
   if(!existing){
-    existing = {
-      name,
-      schedule: {},
-      attendance: 0
-    };
+    existing = { name, schedule:{}, attendance:0 };
     state.subjects.push(existing);
   }
 
@@ -193,22 +220,23 @@ function addSubject(){
 
 function addAttendance(i){
   if(!state.subjects[i]) return;
+
+  feedback("click");
+
   state.subjects[i].attendance++;
   save();
   render();
 }
 
 function getCurrentClass(){
-  if(!state.subjects || state.subjects.length === 0) return null;
+  if(!state.subjects.length) return null;
 
   const now = new Date();
   const day = now.getDay();
   const minutes = now.getHours()*60 + now.getMinutes();
 
   return state.subjects.find(s=>{
-    if(!s.schedule) return false;
-
-    const sch = s.schedule[day];
+    const sch = s.schedule?.[day];
     if(!sch) return false;
 
     const [sh,sm] = sch.start.split(':');
@@ -220,25 +248,6 @@ function getCurrentClass(){
     return minutes >= start && minutes <= end;
   });
 }
-//display
-function updateCurrentClassUI(){
-  if(!currentClassText) return;
-
-  const current = getCurrentClass();
-  const next = getNextClass();
-
-  if(current){
-    const remaining = getRemainingTime(current);
-    currentClassText.textContent = `📍 Estás en: ${current.name || current.title} ${remaining ? `| ⏳ ${remaining}` : ''}`;
-  }
-  else if(next){
-    currentClassText.textContent = `🕒 Siguiente: ${next.name} en ${next.minutes} min`;
-  }
-  else{
-    currentClassText.textContent = "💤 Sin clases ahora";
-  }
-}
-//siguinete clase
 
 function getNextClass(){
   const now = new Date();
@@ -259,58 +268,26 @@ function getNextClass(){
 
     if(diff > 0 && diff < minDiff){
       minDiff = diff;
-      next = {
-        name: s.name,
-        minutes: diff
-      };
+      next = { name: s.name, minutes: diff };
     }
   });
 
   return next;
 }
-// ================= TIEMPO =================
-function getCurrentRoutine(){
-  const now = new Date();
-  const currentMinutes = now.getHours()*60 + now.getMinutes();
 
-  let currentRoutine = null;
+function updateCurrentClassUI(){
+  if(!currentClassText) return;
 
-  getRoutines().forEach(r=>{
-    const [h,m] = r.time.split(':');
-    const start = parseInt(h)*60 + parseInt(m);
-    const end = start + parseInt(r.duration);
+  const current = getCurrentClass();
+  const next = getNextClass();
 
-    if(currentMinutes >= start && currentMinutes <= end){
-      currentRoutine = r;
-    }
-  });
-
-  return currentRoutine;
-}
-
-function getProgress(r){
-  const now = new Date();
-  const [h,m] = r.time.split(':');
-
-  const start = new Date();
-  start.setHours(h,m,0);
-
-  const end = new Date(start.getTime() + r.duration*60000);
-
-  let percent = ((now - start)/(end-start))*100;
-
-  if(percent<0) percent=0;
-  if(percent>100) percent=100;
-
-  return Math.floor(percent);
-}
-
-function formatTime(time){
-  const [h,m]=time.split(':');
-  let hour=parseInt(h);
-  const ampm=hour>=12?'pm':'am';
-  hour=hour%12||12;
-  return `${hour}:${m} ${ampm}`;
+  if(current){
+    currentClassText.textContent = `📍 ${current.name}`;
+  } else if(next){
+    currentClassText.textContent = `🕒 ${next.name} en ${next.minutes} min`;
+  } else {
+    currentClassText.textContent = "💤 Sin clases";
+  }
 }
 
 // ================= CALENDARIO =================
@@ -341,29 +318,9 @@ function renderCalendar(){
   }
 }
 
-//tiempo restante
-function getRemainingTime(r){
-  if(!r.time) return null;
-
-  const now = new Date();
-
-  const [h,m] = r.time.split(':');
-  const start = new Date();
-  start.setHours(h,m,0);
-
-  const end = new Date(start.getTime() + r.duration * 60000);
-
-  const diff = end - now;
-
-  if(diff <= 0) return null;
-
-  const minutes = Math.floor(diff / 60000);
-  return `${minutes} min`;
-}
 // ================= RENDER =================
 function render(){
 
-  // tareas
   const tasks=getTasks();
   dayTitle.textContent=`Tareas del ${selectedDate}`;
   taskList.innerHTML='';
@@ -395,24 +352,6 @@ function render(){
     taskList.appendChild(li);
   });
 
-  function addTask(){
-  const t = taskTitle.value.trim();
-  const d = taskDesc.value.trim();
-  const file = taskImage.files[0];
-
-  if(!t || !d) return;
-
-  feedback("click"); // 🔥
-
-  if(file){
-    const reader = new FileReader();
-    reader.onload = e => saveTask(t,d,e.target.result);
-    reader.readAsDataURL(file);
-  } else {
-    saveTask(t,d,null);
-  }
-}
-
   renderCalendar();
 
   // rutinas
@@ -423,8 +362,6 @@ function render(){
       .map((r,i)=>({...r,originalIndex:i}))
       .sort((a,b)=>a.time.localeCompare(b.time));
 
-    const current=getCurrentRoutine();
-
     sorted.forEach(r=>{
       const li=document.createElement('li');
       li.className='routine-item';
@@ -434,23 +371,9 @@ function render(){
         <div>
           <b>${r.title}</b>
           <small>${r.duration} min</small>
-
-          ${
-            current && r.time===current.time
-            ? `
-              <div class="progress-bar">
-                <div class="progress-fill" style="width:${getProgress(r)}%"></div>
-              </div>
-              <div>${getProgress(r)}%</div>
-            `
-            : ''
-          }
         </div>
         <button class="danger">✖</button>
       `;
-
-      if(r.done) li.classList.add('done');
-      if(current && r.time===current.time) li.classList.add('active');
 
       li.onclick=()=>toggleRoutine(r.originalIndex);
 
@@ -462,43 +385,8 @@ function render(){
       routineList.appendChild(li);
     });
   }
-  function toggleTask(i){
-  const t = getTasks();
-  t[i].done = !t[i].done;
 
-  feedback("complete"); // 🔥 AQUÍ
-
-  save();
-  render();
-
-  setTimeout(()=>{
-    const items = document.querySelectorAll('#taskList li');
-    if(items[i]){
-      items[i].classList.add('completed-anim');
-      setTimeout(()=>items[i].classList.remove('completed-anim'), 400);
-    }
-  },50);
-}
-function addRoutine(){
-  const title = routineTitle.value.trim();
-  const time = routineTime.value;
-  const duration = parseInt(routineDuration.value);
-
-  if(!title || !time || !duration) return;
-
-  feedback("click"); // 🔥
-
-  getRoutines().push({title,time,duration,done:false});
-
-  routineTitle.value='';
-  routineTime.value='';
-  routineDuration.value='';
-
-  save();
-  render();
-}
-
-  // 🎓 universidad
+  // universidad
   if(subjectList){
     subjectList.innerHTML='';
 
@@ -519,41 +407,12 @@ function addRoutine(){
         li.style.border = "2px solid gold";
       }
 
-      li.querySelector('button').onclick = ()=>{
-        addAttendance(i);
-      };
+      li.querySelector('button').onclick = ()=> addAttendance(i);
 
       subjectList.appendChild(li);
     });
   }
 }
-function feedback(type){
-  // 🔊 sonido
-  if(type === "complete"){
-    soundComplete.currentTime = 0;
-    soundComplete.play();
-  }else{
-    soundClick.currentTime = 0;
-    soundClick.play();
-  }
 
-  // 📳 vibración
-  if(navigator.vibrate){
-    if(type === "complete"){
-      navigator.vibrate([50, 30, 50]); // patrón fuerte
-    }else{
-      navigator.vibrate(20); // corto
-    }
-  }
-}
-function addAttendance(i){
-  if(!state.subjects[i]) return;
-
-  feedback("click"); // 🔥
-
-  state.subjects[i].attendance++;
-  save();
-  render();
-}
 // ================= INIT =================
 render();
